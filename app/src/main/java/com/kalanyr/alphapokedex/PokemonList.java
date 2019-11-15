@@ -4,10 +4,26 @@ package com.kalanyr.alphapokedex;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.kalanyr.alphapokedex.Adapter.PokemonListAdapter;
+import com.kalanyr.alphapokedex.Common.Common;
+import com.kalanyr.alphapokedex.Common.ItemOffsetDecoration;
+import com.kalanyr.alphapokedex.Model.Pokedex;
+import com.kalanyr.alphapokedex.Retrofit.IPokemonDex;
+import com.kalanyr.alphapokedex.Retrofit.RetrofitClient;
+
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
 
 
 /**
@@ -15,9 +31,23 @@ import android.view.ViewGroup;
  */
 public class PokemonList extends Fragment {
 
+    IPokemonDex iPokemonDex;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    RecyclerView pokemon_list_recyclerview;
+
+
+    static PokemonList instance;
+
+    public static PokemonList getInstance(){
+        if(instance == null)
+            instance = new PokemonList();
+        return instance;
+    }
+
 
     public PokemonList() {
-        // Required empty public constructor
+        Retrofit retrofit = RetrofitClient.getInstance();
+        iPokemonDex = retrofit.create(IPokemonDex.class);
     }
 
 
@@ -25,7 +55,34 @@ public class PokemonList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pokemon_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_pokemon_list, container, false);
+
+        pokemon_list_recyclerview = (RecyclerView)view.findViewById(R.id.pokemon_list_recyclerview);
+        pokemon_list_recyclerview.setHasFixedSize(true);
+        pokemon_list_recyclerview.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        ItemOffsetDecoration itemOffsetDecoration = new ItemOffsetDecoration(getActivity(), R.dimen.spacing);
+        pokemon_list_recyclerview.addItemDecoration(itemOffsetDecoration);
+
+        fetchData();
+
+        return view;
+    }
+
+    private void fetchData() {
+        compositeDisposable.add(iPokemonDex.getListPokemon()
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Pokedex>() {
+                    @Override
+                    public void accept(Pokedex pokedex) throws Exception {
+                        PokemonListAdapter adapter;
+                        Common.commonPokemonList = pokedex.getPokemon();
+                        adapter = new PokemonListAdapter(getActivity(),Common.commonPokemonList);
+
+                        pokemon_list_recyclerview.setAdapter(adapter);
+                    }
+                })
+        );
     }
 
 }
