@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip">
+    android:layout_height="match_parent"
+    android:padding="4dip">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -15,10 +15,9 @@
         android:layout_height="wrap_content"
         ></androidx.appcompat.widget.Toolbar>
 
-    <fragment
-        android:id="@+id/list_pokemon_fragment"
-        android:name="com.kalanyr.alphapokedex.PokemonList"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

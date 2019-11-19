@@ -18,6 +18,10 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new PokemonList())
+                .commit();
+
         //toolbar = (Toolbar)findViewById(R.id.toolbar);
         //toolbar.setTitle("POKEMON LIST");
         //setActionBar(toolbar);
