@@ -4,6 +4,7 @@ package com.kalanyr.alphapokedex;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
 import com.kalanyr.alphapokedex.Adapter.PokemonListAdapter;
-import com.kalanyr.alphapokedex.Common.Common;
 import com.kalanyr.alphapokedex.Common.ItemOffsetDecoration;
+import com.kalanyr.alphapokedex.Interface.IItemClickListener;
 import com.kalanyr.alphapokedex.Model.Pokedex;
+import com.kalanyr.alphapokedex.Model.Pokemon;
 import com.kalanyr.alphapokedex.Retrofit.IPokemonDex;
 import com.kalanyr.alphapokedex.Retrofit.RetrofitClient;
 
@@ -76,7 +79,21 @@ public class PokemonList extends Fragment {
                     @Override
                     public void accept(Pokedex pokedex) throws Exception {
                         PokemonListAdapter adapter;
-                        adapter = new PokemonListAdapter(getActivity(),pokedex.getPokemon());
+                        adapter = new PokemonListAdapter(getActivity(), pokedex.getPokemon(), new IItemClickListener() {
+                            @Override
+                            public void onClick(Pokemon pokemon, Integer position) {
+                                Fragment detailFragment = PokemonDetail.getInstance();
+                                Bundle bundle = new Bundle();
+                                Gson gson = new Gson();
+                                bundle.putString("pokemon", gson.toJson(pokemon));
+                                detailFragment.setArguments(bundle);
+
+                                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                fragmentTransaction.replace(R.id.fragment_container, detailFragment);
+                                fragmentTransaction.addToBackStack("detail");
+                                fragmentTransaction.commit();
+                            }
+                        });
 
                         pokemon_list_recyclerview.setAdapter(adapter);
                         adapter.notifyDataSetChanged();

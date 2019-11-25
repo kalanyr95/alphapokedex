@@ -21,10 +21,12 @@ public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.
 
     Context context;
     List<Pokemon> pokemonList;
+    private IItemClickListener listener;
 
-    public PokemonListAdapter(Context context, List<Pokemon> pokemonList) {
+    public PokemonListAdapter(Context context, List<Pokemon> pokemonList, IItemClickListener listener) {
         this.context = context;
         this.pokemonList = pokemonList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -35,12 +37,19 @@ public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
 
         //Load
         Glide.with(context).load(pokemonList.get(position).getImg()).into(holder.pokemon_image);
         //Change name
         holder.pokemon_name.setText(pokemonList.get(position).getName());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onClick(pokemonList.get(position), position);
+            }
+        });
 
     }
 
@@ -49,23 +58,15 @@ public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.
         return pokemonList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView pokemon_image;
         TextView pokemon_name;
-
-        IItemClickListener iItemClickListener;
-        public void setiItemClickListener(IItemClickListener iItemClickListener){
-            this.iItemClickListener = iItemClickListener;
-        }
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             pokemon_image = (ImageView)itemView.findViewById(R.id.pokemon_image);
             pokemon_name = (TextView)itemView.findViewById(R.id.txt_pokemon_name);
-
-            itemView.setOnClickListener(this);
         }
-
     }
 }
