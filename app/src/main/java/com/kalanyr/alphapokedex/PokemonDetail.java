@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.kalanyr.alphapokedex.Adapter.PokemonTypeAdapter;
 import com.kalanyr.alphapokedex.Common.Common;
 import com.kalanyr.alphapokedex.Model.Pokemon;
 
@@ -86,6 +87,17 @@ public class PokemonDetail extends Fragment {
         pokemon_name.setText(pokemon.getName());
         pokemon_weight.setText("Weight : "+pokemon.getWeight());
         pokemon_height.setText("Height : "+pokemon.getHeight());
+
+        //Set Type
+
+        PokemonTypeAdapter typeAdapter = new PokemonTypeAdapter(getActivity(), pokemon.getType());
+        recycler_type.setAdapter(typeAdapter);
+
+        //Set Weakness
+
+        PokemonTypeAdapter weaknessAdapter = new PokemonTypeAdapter(getActivity(), pokemon.getWeaknesses());
+        recycler_weakness.setAdapter(weaknessAdapter);
+
     }
 
 }
